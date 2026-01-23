@@ -1,0 +1,38 @@
+# Rust build artifacts
+/target/
+**/*.rs.bk
+*.pdb
+
+# Cargo
+Cargo.lock
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Embedded development
+*.elf
+*.bin
+*.hex
+*.uf2
+*.map
+
+# Probe-rs / cargo-embed
+*.probe-rs/
+
+# Embed
+Embed.toml
+
+# Preview frames from overlay app
+preview_frames/
+
+# Editor
+.DS_Store/
+Thumbs.db
+
+# Claude
+/.claude/
+CLAUDE.md
