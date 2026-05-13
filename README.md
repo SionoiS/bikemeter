@@ -41,10 +41,12 @@ Firmware logs CSV data → Desktop app reads CSV + video → Overlay output
 | Crate | Purpose | Source |
 |-------|---------|--------|
 | `rp235x-hal` | Hardware Abstraction Layer for RP2350/Pico 2 | [docs.rs](https://docs.rs/rp235x-hal) |
-| `embassy-rp` | Async embedded framework for RP chips | [embassy.dev](https://embassy.dev) |
-| `bno055` | Driver for BNO055 IMU sensor | [crates.io](https://crates.io/crates/bno055) |
+| `embassy-rp` | Async embedded framework + HAL for RP chips | [embassy.dev](https://embassy.dev) |
+| `bno055` | Driver for BNO055 IMU sensor (embedded-hal 1.0) | [GitHub](https://github.com/eupn/bno055) |
 | `embedded-sdmmc` | FAT filesystem for SD cards (no_std) | [GitHub](https://github.com/rust-embedded-community/embedded-sdmmc-rs) |
 | `embedded-hal` | Hardware abstraction traits | [embedded.rs](https://embedded.rs) |
+| `embedded-hal-bus` | SPI bus sharing utilities | [docs.rs](https://docs.rs/embedded-hal-bus) |
+| `libm` | Math functions (sqrt) for no_std | [docs.rs](https://docs.rs/libm) |
 
 ### Desktop Application Crates (Video Overlay)
 
@@ -77,6 +79,8 @@ Firmware logs CSV data → Desktop app reads CSV + video → Overlay output
 rustup target add thumbv8m.main-none-eabihf
 cargo install probe-rs --features cli
 ```
+
+**Note:** The BNO055 driver uses a git dependency (`https://github.com/eupn/bno055`) for embedded-hal 1.0 compatibility.
 
 **For overlay application:**
 - FFmpeg libraries installed on your system
@@ -176,16 +180,25 @@ timestamp_ms,accel_x,accel_y,accel_z,pitch,roll,yaw,quat_w,quat_x,quat_y,quat_z
 
 | Pico 2 | SD Module |
 |--------|-----------|
-| GP11 | CLK/SCK |
-| GP12 | MOSI/DI |
-| GP13 | MISO/DO |
+| GP10 | CLK/SCK |
+| GP11 | MOSI/DI |
+| GP12 | MISO/DO |
 | GP15 | CS/CD |
 | 3V3 | VCC |
 | GND | GND |
 
+### Pico 2 to Stop Button
+
+| Pico 2 | Button |
+|--------|--------|
+| GP9 | One leg |
+| GND | Other leg |
+
+Button uses internal pull-up (no external resistor needed). Press to stop recording and save data.
+
 ## Implementation Plan
 
-### Phase 1: Firmware Development (Complete)
+### Phase 1: Firmware Development
 
 - [x] Create Cargo workspace with `firmware/` and `overlay/` members
 - [x] Configure `firmware/Cargo.toml` with embedded dependencies
@@ -193,12 +206,12 @@ timestamp_ms,accel_x,accel_y,accel_z,pitch,roll,yaw,quat_w,quat_x,quat_y,quat_z
 - [x] Initialize I2C bus on Pico 2
 - [x] Configure BNO055 in NDOF (9 degrees of freedom) mode
 - [x] Read acceleration and orientation data
-- [ ] Complete SD card logging with CSV format
-- [ ] Add file rotation for long rides
-- [ ] Add LED indicators for recording status
-- [ ] Implement safe shutdown handling
+- [x] Complete SD card logging with CSV format
+- [x] Add file rotation for long rides
+- [x] Add LED indicators for recording status
+- [x] Implement safe shutdown handling
 
-### Phase 2: Desktop Overlay Application (Complete)
+### Phase 2: Desktop Overlay Application
 
 - [x] Parse CSV files from SD card
 - [x] Handle timestamp synchronization
